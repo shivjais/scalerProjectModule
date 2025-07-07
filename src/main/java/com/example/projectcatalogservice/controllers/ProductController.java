@@ -1,45 +1,67 @@
 package com.example.projectcatalogservice.controllers;
 
+import com.example.projectcatalogservice.dtos.ProductDto;
 import com.example.projectcatalogservice.models.Product;
+import com.example.projectcatalogservice.service.IProductService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProductController {
 
-    @GetMapping("/products")
-    public List<Product> getProducts() {
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("iphone");
+    @Autowired
+    private IProductService productService;
 
-        List<Product> products = new ArrayList<>();
-        products.add(product);
-        return products;
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductDto>> getProducts() {
+        List<Product> products = productService.getAllProduct();
+        if(!products.isEmpty()){
+            List<ProductDto> productDtos = products.stream().map(this::getProductDto).toList();
+            return new ResponseEntity<>(productDtos,HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/product/{id}")
-    public Product getProductById(@PathVariable("id") Long productId) {
-        Product product = new Product();
-        product.setId(productId);
-        return product;
+    public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
+        //it's better to add validation in controller
+        if(productId<=0){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Product product = productService.getProductById(productId);
+        if(product == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        ProductDto productDto = getProductDto(product);
+        return new ResponseEntity<>(productDto, HttpStatus.OK);
+    }
+
+    private ProductDto getProductDto(Product product) {
+        ProductDto productDto = new ProductDto();
+        productDto.setId(product.getId());
+        productDto.setName(product.getName());
+        productDto.setDescription(product.getDescription());
+        productDto.setPrice(product.getPrice());
+        productDto.setImageUrl(product.getImageUrl());
+        if(product.getCategory() != null) {
+            productDto.setCategory(product.getCategory());
+        }
+        return productDto;
     }
 
     @PostMapping("/products")
-    public Product createProduct(@RequestBody Product product) {
-        return product;
+    public ProductDto createProduct(@RequestBody ProductDto product) {
+        return null;
     }
 
     @PutMapping("/product")
-    public Product updateProduct(@RequestBody Product product) {
-        Product updatedProduct = new Product();
-        updatedProduct.setId(product.getId());
-        updatedProduct.setName(product.getName());
-        updatedProduct.setDescription(product.getDescription());
-        updatedProduct.setPrice(product.getPrice());
-        return updatedProduct;
+    public ProductDto updateProduct(@RequestBody ProductDto product) {
+
+        return null;
     }
 
     @DeleteMapping("/products/{productId}")
