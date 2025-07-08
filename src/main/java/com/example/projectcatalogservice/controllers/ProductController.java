@@ -28,29 +28,17 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/product/{id}")
+    @GetMapping("/products/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long productId) {
         //it's better to add validation in controller
         if(productId<=0){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            //return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new IllegalArgumentException("Invalid product ID");
         }
         Product product = productService.getProductById(productId);
         if(product == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         ProductDto productDto = getProductDto(product);
         return new ResponseEntity<>(productDto, HttpStatus.OK);
-    }
-
-    private ProductDto getProductDto(Product product) {
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        productDto.setName(product.getName());
-        productDto.setDescription(product.getDescription());
-        productDto.setPrice(product.getPrice());
-        productDto.setImageUrl(product.getImageUrl());
-        if(product.getCategory() != null) {
-            productDto.setCategory(product.getCategory());
-        }
-        return productDto;
     }
 
     @PostMapping("/products")
@@ -60,19 +48,6 @@ public class ProductController {
         if(createdProduct == null) return null;
         ProductDto response = getProductDto(createdProduct);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    private Product from(ProductDto productDto) {
-        Product product = new Product();
-        product.setId(productDto.getId());
-        product.setName(productDto.getName());
-        product.setDescription(productDto.getDescription());
-        product.setPrice(productDto.getPrice());
-        product.setImageUrl(productDto.getImageUrl());
-        if(productDto.getCategory() != null) {
-            product.setCategory(productDto.getCategory());
-        }
-        return product;
     }
 
     @PutMapping("/products/{id}")
@@ -88,5 +63,39 @@ public class ProductController {
     @DeleteMapping("/products/{productId}")
     public String deleteProduct(@PathVariable Long productId) {
         return "Product deleted having id: "+productId;
+    }
+
+    //This exception handler listen response of all APIs present in this class
+    //if we got any of mentioned exception then this method return exception message with HTTP status
+    //If we want handle all the mentioned exception for any class, for that we have defined global exception handler
+    /* @ExceptionHandler({IllegalArgumentException.class,NullPointerException.class})
+    public ResponseEntity<String> handleExceptions(Exception ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    } */
+
+    private ProductDto getProductDto(Product product) {
+        ProductDto productDto = new ProductDto();
+        productDto.setId(product.getId());
+        productDto.setName(product.getName());
+        productDto.setDescription(product.getDescription());
+        productDto.setPrice(product.getPrice());
+        productDto.setImageUrl(product.getImageUrl());
+        if(product.getCategory() != null) {
+            productDto.setCategory(product.getCategory());
+        }
+        return productDto;
+    }
+
+    private Product from(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImageUrl());
+        if(productDto.getCategory() != null) {
+            product.setCategory(productDto.getCategory());
+        }
+        return product;
     }
 }
