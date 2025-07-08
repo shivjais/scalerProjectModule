@@ -54,14 +54,35 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ProductDto createProduct(@RequestBody ProductDto product) {
-        return null;
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+        Product product = from(productDto);
+        Product createdProduct = productService.createProduct(product);
+        if(createdProduct == null) return null;
+        ProductDto response = getProductDto(createdProduct);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/product")
-    public ProductDto updateProduct(@RequestBody ProductDto product) {
+    private Product from(ProductDto productDto) {
+        Product product = new Product();
+        product.setId(productDto.getId());
+        product.setName(productDto.getName());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setImageUrl(productDto.getImageUrl());
+        if(productDto.getCategory() != null) {
+            product.setCategory(productDto.getCategory());
+        }
+        return product;
+    }
 
-        return null;
+    @PutMapping("/products/{id}")
+    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto productDto,@PathVariable Long id) {
+        if(id<=0){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Product product = from(productDto);
+        Product updatedProduct = productService.updateProduct(product,id);
+        return new ResponseEntity<>(getProductDto(updatedProduct), HttpStatus.OK);
     }
 
     @DeleteMapping("/products/{productId}")
