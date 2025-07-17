@@ -1,6 +1,8 @@
 package com.example.projectcatalogservice.controllers;
 
+import com.example.projectcatalogservice.dtos.CategoryDto;
 import com.example.projectcatalogservice.dtos.ProductDto;
+import com.example.projectcatalogservice.models.Category;
 import com.example.projectcatalogservice.models.Product;
 import com.example.projectcatalogservice.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class ProductController {
@@ -81,7 +81,11 @@ public class ProductController {
         productDto.setPrice(product.getPrice());
         productDto.setImageUrl(product.getImageUrl());
         if(product.getCategory() != null) {
-            productDto.setCategory(product.getCategory());
+            CategoryDto categoryDto = new CategoryDto();
+            categoryDto.setDescription(product.getDescription());
+            categoryDto.setId(product.getCategory().getId());
+            categoryDto.setName(product.getCategory().getName());
+            productDto.setCategory(categoryDto);
         }
         return productDto;
     }
@@ -94,7 +98,11 @@ public class ProductController {
         product.setPrice(productDto.getPrice());
         product.setImageUrl(productDto.getImageUrl());
         if(productDto.getCategory() != null) {
-            product.setCategory(productDto.getCategory());
+            Category category = new Category();
+            category.setId(productDto.getCategory().getId());
+            category.setName(productDto.getCategory().getName());
+            category.setDescription(productDto.getCategory().getDescription());
+            product.setCategory(category);
         }
         return product;
     }
