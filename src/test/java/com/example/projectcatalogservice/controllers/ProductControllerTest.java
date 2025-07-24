@@ -4,6 +4,8 @@ import com.example.projectcatalogservice.dtos.ProductDto;
 import com.example.projectcatalogservice.models.Product;
 import com.example.projectcatalogservice.service.IProductService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class ProductControllerTest {
@@ -23,6 +25,9 @@ class ProductControllerTest {
 
     @MockBean
     private IProductService productService;
+
+    @Captor
+    private ArgumentCaptor<Long> longArgumentCaptor;
 
     @Test
     public void TestGetProductById_ValidId_RunSuccess(){
@@ -43,6 +48,13 @@ class ProductControllerTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(id, responseEntity.getBody().getId());
+
+        //always use verify with mocked object
+        //verify how many times productService.getProductById() is called
+        verify(productService,times(1)).getProductById(id);
+        //verify productService.getProductById() is called with same id which we are passing in args
+        verify(productService).getProductById(longArgumentCaptor.capture()); //longArgumentCaptor.capture() capture the arg
+        assertEquals(id,longArgumentCaptor.getValue()); //validate the provided id with calling id must be same
     }
 
     @Test
@@ -54,6 +66,8 @@ class ProductControllerTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> productController.getProductById(id));
         //validating the exception message
         assertEquals("Invalid product ID",exception.getMessage());
+        //verify
+        verify(productService,times(0)).getProductById(id);
     }
 
     @Test
@@ -104,5 +118,4 @@ class ProductControllerTest {
         ResponseEntity<ProductDto> responseEntity  = productController.createProduct(productDto);
         assertNull(responseEntity);
     }
-
 }
