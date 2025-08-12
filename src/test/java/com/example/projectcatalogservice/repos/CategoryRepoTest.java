@@ -22,7 +22,7 @@ class CategoryRepoTest {
     @Test
     @Transactional
     public void findByIdTest() {
-        Category category = categoryRepo.findById(101L).get();
+        Category category = categoryRepo.findById(1L).get();
         String name = category.getName();
 //        for(Product product : category.getProducts()){
 //            System.out.println(product.getName());
