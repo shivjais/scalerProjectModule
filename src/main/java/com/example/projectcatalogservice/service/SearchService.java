@@ -26,6 +26,7 @@ public class SearchService implements ISearchService{
         /*Sort sortById = Sort.by("id").descending();
         Sort sort = Sort.by("price").descending().and(sortById);*/
 
+        //Passing sorting params dynamically
         Sort sort = null;
         if (!sortParams.isEmpty()) {
             if(sortParams.get(0).getSortType().equals(SortType.ASC)) {
