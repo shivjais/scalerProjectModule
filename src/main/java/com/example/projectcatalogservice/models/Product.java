@@ -1,5 +1,6 @@
 package com.example.projectcatalogservice.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -16,6 +17,7 @@ public class Product extends BaseModel {
     //due to cascadeType ALL, all operation on parent will be reflected to child
     //if we create a product whose category doesn't exist, then it will create category as well
     @ManyToOne(cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Category category;
 
     private Double price;
