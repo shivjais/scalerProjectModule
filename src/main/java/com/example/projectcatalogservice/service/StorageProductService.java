@@ -1,10 +1,13 @@
 package com.example.projectcatalogservice.service;
 
+import com.example.projectcatalogservice.dtos.UserDto;
 import com.example.projectcatalogservice.models.Product;
 import com.example.projectcatalogservice.repos.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +18,8 @@ public class StorageProductService implements IProductService{
 
     @Autowired
     private ProductRepo productRepo;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public List<Product> getAllProduct() {
@@ -49,5 +54,18 @@ public class StorageProductService implements IProductService{
             throw new IllegalArgumentException("Product not found");
         }
         return productRepo.save(product); //this will update existing product
+    }
+
+    @Override
+    public Product getProductByUserId(Long productId, Long userId) {
+        Optional<Product> productOptional = productRepo.findById(productId);
+        if (productOptional.isPresent()) {
+            UserDto userDto = restTemplate.getForEntity("http://userauthservice/users/{userId}", UserDto.class, userId).getBody();
+            if (userDto != null) {
+                System.out.println(userDto.getEmail());
+                return productOptional.get();
+            }
+        }
+        return null;
     }
 }

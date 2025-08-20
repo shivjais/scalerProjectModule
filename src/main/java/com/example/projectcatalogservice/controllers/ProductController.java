@@ -65,6 +65,12 @@ public class ProductController {
         return "Product deleted having id: "+productId;
     }
 
+    @GetMapping("/products/{productId}/{userId}")
+    public ProductDto getProductByIdAndUserId(@PathVariable Long productId, @PathVariable Long userId) {
+        Product product = productService.getProductByUserId(productId,userId);
+        return getProductDto(product);
+    }
+
     //This exception handler listen response of all APIs present in this class
     //if we got any of mentioned exception then this method return exception message with HTTP status
     //If we want handle all the mentioned exception for any class, for that we have defined global exception handler

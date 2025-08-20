@@ -6,6 +6,7 @@ import com.example.projectcatalogservice.models.Category;
 import com.example.projectcatalogservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -50,6 +51,10 @@ public class FakeStoreProductService implements IProductService{
         return from(updatedProduct);
     }
 
+    @Override
+    public Product getProductByUserId(Long productId, Long userId) {
+        return null;
+    }
 
 
     private Product from(FakeStoreProductDto fakeStoreProductDto) {
