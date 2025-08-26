@@ -5,16 +5,22 @@ import com.example.projectcatalogservice.dtos.FakeStoreProductDto;
 import com.example.projectcatalogservice.models.Category;
 import com.example.projectcatalogservice.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @Service
+@Primary
 public class FakeStoreProductService implements IProductService{
 
     @Autowired
     private FakeStoreApiClient  fakeStoreApiClient;
+
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
 
     @Override
     public List<Product> getAllProduct() {
@@ -26,9 +32,20 @@ public class FakeStoreProductService implements IProductService{
 
     @Override
     public Product getProductById(Long productId) {
-        FakeStoreProductDto fakeStoreProduct = fakeStoreApiClient.getProductById(productId);
-        if (fakeStoreProduct == null)
-            return null;
+        //if found in cache return it else get it from fakestore
+        FakeStoreProductDto fakeStoreProduct;
+        fakeStoreProduct = (FakeStoreProductDto) redisTemplate.opsForHash().get("PRODUCTS",productId);
+
+        if(fakeStoreProduct==null){
+            System.out.println("product found from fake store");
+            fakeStoreProduct = fakeStoreApiClient.getProductById(productId);
+            if (fakeStoreProduct == null) return null;
+            //store it in cache
+            redisTemplate.opsForHash().put("PRODUCTS",productId,fakeStoreProduct);
+        }
+        else{
+            System.out.println("product found from Redis");
+        }
         //convert FakeStoreProductDto to product
         return from(fakeStoreProduct);
     }

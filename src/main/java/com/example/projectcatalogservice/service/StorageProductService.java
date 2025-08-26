@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Primary //Making this class as primary bean implementation so that
+//@Primary //Making this class as primary bean implementation so that
 public class StorageProductService implements IProductService{
 
     @Autowired
