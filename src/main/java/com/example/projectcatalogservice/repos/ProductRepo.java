@@ -19,6 +19,7 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
     Product save(Product product);
 
     List<Product> findProductByPriceBetween(Double priceAfter, Double priceBefore);
+    //List<Product> findByPriceBetween(Double priceAfter, Double priceBefore); // this query & above query is same
 
     List<Product> findAllByOrderByPriceDesc();
 
