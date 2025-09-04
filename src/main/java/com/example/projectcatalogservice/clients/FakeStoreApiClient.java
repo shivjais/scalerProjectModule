@@ -4,13 +4,11 @@ import com.example.projectcatalogservice.dtos.FakeStoreProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 
 import java.util.List;
 
@@ -22,7 +20,10 @@ public class FakeStoreApiClient {
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
 
-    public List<FakeStoreProductDto> getAllProduct() {
+    @Autowired
+    private RestClient restClient;
+
+    /*public List<FakeStoreProductDto> getAllProduct() {
 
         ResponseEntity<FakeStoreProductDto[]> responseEntity = requestForEntity("https://fakestoreapi.com/products", null, HttpMethod.GET, FakeStoreProductDto[].class);
         if(responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.hasBody()){
@@ -31,6 +32,16 @@ public class FakeStoreApiClient {
             return List.of(fakeStoreProductDtos);
         }
         return null;
+    }*/
+
+    //Calling fakestore API using rest client
+    public List<FakeStoreProductDto> getAllProduct() {
+        FakeStoreProductDto[] fakeStoreProductDtos = restClient.get()
+                .uri("https://fakestoreapi.com/products")
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(FakeStoreProductDto[].class);
+        return List.of(fakeStoreProductDtos);
     }
 
     //This will only return the body of 3rd party API
